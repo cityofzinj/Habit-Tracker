@@ -513,6 +513,226 @@
     box-shadow: 0 1px 3px var(--habit-shadow, rgba(0, 0, 0, 0.15));
   }
 
+  /* View-mode toggle */
+  .view-mode-toggle {
+    display: inline-flex;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    padding: 3px;
+    gap: 2px;
+    margin-bottom: 18px;
+  }
+  .mode-btn {
+    padding: 7px 18px;
+    background: transparent;
+    border: none;
+    color: var(--text-muted);
+    font-size: 13px;
+    font-weight: 500;
+    border-radius: 999px;
+    cursor: pointer;
+    transition: all 0.15s;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .mode-btn:hover { color: var(--text); }
+  .mode-btn.active {
+    background: var(--card);
+    color: var(--primary);
+    box-shadow: var(--shadow-sm);
+    font-weight: 600;
+  }
+
+  /* Mode visibility */
+  .week-view { display: none; }
+  [data-view-mode="month"] .week-view { display: none; }
+  [data-view-mode="week"] .tracker-wrap { display: none; }
+  [data-view-mode="week"] .week-view { display: block; }
+
+  /* Week view */
+  .week-nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 8px 10px;
+    margin-bottom: 12px;
+    box-shadow: var(--shadow-sm);
+  }
+  .week-nav-title {
+    margin: 0;
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+  .week-nav-title .week-this {
+    color: var(--primary);
+    margin-right: 6px;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    font-weight: 700;
+  }
+  .week-cards {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .week-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 14px 16px;
+    box-shadow: var(--shadow-sm);
+    border-left: 4px solid var(--habit-color, var(--primary));
+    cursor: pointer;
+    transition: transform 0.1s, box-shadow 0.15s;
+  }
+  .week-card:active { transform: scale(0.997); }
+  .week-card-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+    gap: 12px;
+  }
+  .week-card-name {
+    font-family: 'Caveat', cursive;
+    font-size: 24px;
+    font-weight: 600;
+    color: var(--habit-color, var(--text));
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    line-height: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .week-card-name .name-icon {
+    font-family: 'Inter', sans-serif;
+    font-size: 18px;
+  }
+  .week-card-streak {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    flex-shrink: 0;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    padding: 3px 10px;
+  }
+  .week-card-streak.active {
+    color: white;
+    background: var(--habit-color, var(--primary));
+    border-color: var(--habit-color, var(--primary));
+  }
+  .week-days {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 4px;
+  }
+  .week-day {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    padding: 6px 2px;
+    border-radius: 8px;
+    cursor: pointer;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+    transition: background 0.12s;
+  }
+  .week-day-label {
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    color: var(--text-subtle);
+    letter-spacing: 0.04em;
+  }
+  .week-day-num {
+    font-size: 11px;
+    color: var(--text-muted);
+    font-weight: 500;
+  }
+  .week-day.today .week-day-num { color: var(--primary); font-weight: 700; }
+  .week-day-dot {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: transparent;
+    border: 1.5px solid var(--border-strong);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.18s, border-color 0.18s, transform 0.12s;
+    margin-top: 2px;
+  }
+  .week-day-dot svg {
+    width: 60%; height: 60%;
+    stroke: white;
+    stroke-width: 3.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    fill: none;
+    opacity: 0;
+    transition: opacity 0.18s;
+  }
+  .week-day.filled .week-day-dot {
+    background: var(--habit-color);
+    border-color: var(--habit-color);
+    box-shadow: 0 1px 3px var(--habit-shadow, rgba(0,0,0,0.15));
+  }
+  .week-day.filled .week-day-dot svg { opacity: 1; }
+  .week-day.today .week-day-dot {
+    box-shadow: 0 0 0 2px var(--card), 0 0 0 3.5px var(--habit-color, var(--primary));
+  }
+  .week-day.filled.today .week-day-dot {
+    box-shadow: 0 0 0 2px var(--card), 0 0 0 3.5px var(--habit-color, var(--primary)), 0 1px 3px var(--habit-shadow, rgba(0,0,0,0.15));
+  }
+  .week-day.unscheduled { opacity: 0.35; cursor: default; }
+  .week-day.unscheduled .week-day-dot { border-style: dashed; }
+  .week-day:active:not(.unscheduled) .week-day-dot { transform: scale(0.92); }
+
+  .week-add {
+    width: 100%;
+    margin-top: 12px;
+    background: var(--card);
+    border: 1.5px dashed var(--border-strong);
+    border-radius: var(--radius-md);
+    padding: 16px;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: all 0.15s;
+    font-weight: 500;
+    font-size: 14px;
+    font-family: inherit;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+  .week-add:hover, .week-add:active {
+    color: var(--primary);
+    border-color: var(--primary);
+    background: var(--primary-soft);
+  }
+  .week-empty {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--text-muted);
+    font-size: 14px;
+  }
+
   /* Empty/ledger rows for adding new habits */
   .grid-cell.name.empty-row {
     color: var(--text-subtle);
@@ -970,7 +1190,7 @@
 
   <main class="main">
     <!-- ===== TRACKER VIEW ===== -->
-    <section class="view active" id="view-today">
+    <section class="view active" id="view-today" data-view-mode="month">
       <div class="tracker-head">
         <div class="head-left">
           <h1 class="tracker-title">Habit Tracker</h1>
@@ -982,9 +1202,40 @@
         </div>
         <div class="tracker-year" id="yearLabel"></div>
       </div>
+
+      <div class="view-mode-toggle" role="tablist" aria-label="View mode">
+        <button class="mode-btn" data-mode="week" role="tab">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          Week
+        </button>
+        <button class="mode-btn" data-mode="month" role="tab">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          Month
+        </button>
+      </div>
+
+      <!-- Month view -->
       <div class="tracker-wrap">
         <div class="months-bar" id="monthsBar"></div>
         <div class="tracker-grid" id="trackerGrid"></div>
+      </div>
+
+      <!-- Week view -->
+      <div class="week-view">
+        <div class="week-nav">
+          <button class="icon-btn" id="weekPrev" aria-label="Previous week">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+          </button>
+          <h3 class="week-nav-title" id="weekTitle">—</h3>
+          <button class="icon-btn" id="weekNext" aria-label="Next week">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+          </button>
+        </div>
+        <div class="week-cards" id="weekCards"></div>
+        <button class="week-add" id="weekAdd">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Add a habit
+        </button>
       </div>
     </section>
 
@@ -1207,6 +1458,7 @@
 
 const STORAGE_KEY = 'habit-tracker-v2';
 const THEME_KEY = 'habit-tracker-theme';
+const VIEW_MODE_KEY = 'habit-tracker-view-mode';
 
 const COLORS = ['#2563eb', '#0ea5e9', '#06b6d4', '#10b981', '#f59e0b', '#ef4444', '#a855f7', '#ec4899'];
 const MONTH_LABELS = ['JANUARY','FEBRUARY','MARCH','APRIL','MAY','JUNE','JULY','AUGUST','SEPTEMBER','OCTOBER','NOVEMBER','DECEMBER'];
@@ -1214,6 +1466,16 @@ const EMPTY_ROWS_AFTER_HABITS = 6;
 
 let state = load();
 let viewMonth = { year: new Date().getFullYear(), month: new Date().getMonth() };
+let viewMode = localStorage.getItem(VIEW_MODE_KEY)
+            || (window.matchMedia('(max-width: 800px)').matches ? 'week' : 'month');
+let viewWeek = weekStart(new Date());
+
+function weekStart(d) {
+  const x = new Date(d);
+  x.setHours(0, 0, 0, 0);
+  x.setDate(x.getDate() - x.getDay());
+  return x;
+}
 
 function load() {
   try {
@@ -1415,9 +1677,94 @@ function renderTracker() {
   document.getElementById('streakNum').textContent = streak;
   const pill = document.getElementById('streakPill');
   pill.classList.toggle('zero', streak === 0);
-  pill.querySelector('.streak-label').textContent = streak === 1 ? 'day streak' : 'day streak';
-  renderMonths();
-  renderGrid();
+  if (viewMode === 'week') {
+    renderWeek();
+  } else {
+    renderMonths();
+    renderGrid();
+  }
+}
+
+function applyViewMode() {
+  document.getElementById('view-today').dataset.viewMode = viewMode;
+  document.querySelectorAll('.mode-btn').forEach(b => {
+    b.classList.toggle('active', b.dataset.mode === viewMode);
+  });
+}
+
+function setViewMode(mode) {
+  viewMode = mode;
+  localStorage.setItem(VIEW_MODE_KEY, mode);
+  applyViewMode();
+  renderTracker();
+}
+
+function renderWeek() {
+  const start = new Date(viewWeek);
+  const end = new Date(start);
+  end.setDate(end.getDate() + 6);
+
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const todayKey = ymd();
+  const thisWeekStart = weekStart(today);
+  const isThisWeek = start.getTime() === thisWeekStart.getTime();
+
+  const fmt = d => d.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+  const titleEl = document.getElementById('weekTitle');
+  titleEl.innerHTML = `${isThisWeek ? '<span class="week-this">This week</span>' : ''}<span>${fmt(start)} – ${fmt(end)}</span>`;
+
+  const days = [];
+  for (let i = 0; i < 7; i++) {
+    const d = new Date(start);
+    d.setDate(start.getDate() + i);
+    days.push(d);
+  }
+  const dayLabels = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
+  const cardsEl = document.getElementById('weekCards');
+
+  if (state.habits.length === 0) {
+    cardsEl.innerHTML = `<div class="week-empty">
+      <div style="font-weight:600; color: var(--text); margin-bottom:4px;">No habits yet</div>
+      Tap "Add a habit" below to start tracking.
+    </div>`;
+    return;
+  }
+
+  cardsEl.innerHTML = state.habits.map(h => {
+    const habitColor = h.color || COLORS[0];
+    const habitShadow = hexToRgba(habitColor, 0.35);
+    const styleVars = `--habit-color: ${habitColor}; --habit-shadow: ${habitShadow};`;
+    const { current } = streaksFor(h);
+
+    const daysHtml = days.map(d => {
+      const k = ymd(d);
+      const checked = !!h.completions[k];
+      const sched = isScheduled(h, d);
+      const isToday = k === todayKey;
+      const cls = ['week-day',
+        checked ? 'filled' : '',
+        !sched ? 'unscheduled' : '',
+        isToday ? 'today' : ''
+      ].filter(Boolean).join(' ');
+      return `<div class="${cls}" data-habit="${h.id}" data-key="${k}" ${!sched ? 'data-unsched="1"' : ''}>
+        <div class="week-day-label">${dayLabels[d.getDay()]}</div>
+        <div class="week-day-num">${d.getDate()}</div>
+        <div class="week-day-dot"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+      </div>`;
+    }).join('');
+
+    return `<div class="week-card" style="${styleVars}" data-edit="${h.id}">
+      <div class="week-card-head">
+        <span class="week-card-name">
+          ${h.icon ? `<span class="name-icon">${escapeHtml(h.icon)}</span>` : ''}
+          <span>${escapeHtml(h.name)}</span>
+        </span>
+        <span class="week-card-streak ${current > 0 ? 'active' : ''}">🔥 ${current}d</span>
+      </div>
+      <div class="week-days">${daysHtml}</div>
+    </div>`;
+  }).join('');
 }
 
 function renderMonths() {
@@ -1793,6 +2140,35 @@ document.getElementById('monthsBar').addEventListener('click', e => {
   renderTracker();
 });
 
+// View mode toggle
+document.querySelectorAll('.mode-btn').forEach(btn => {
+  btn.addEventListener('click', () => setViewMode(btn.dataset.mode));
+});
+
+// Week view interactions
+document.getElementById('weekCards').addEventListener('click', e => {
+  const day = e.target.closest('.week-day');
+  if (day) {
+    if (day.dataset.unsched) return;
+    const h = getHabit(day.dataset.habit);
+    if (h) toggleDay(h, day.dataset.key);
+    return;
+  }
+  const editTarget = e.target.closest('[data-edit]');
+  if (editTarget) { openHabitModal(editTarget.dataset.edit); return; }
+});
+document.getElementById('weekAdd').addEventListener('click', () => openHabitModal(null));
+document.getElementById('weekPrev').addEventListener('click', () => {
+  viewWeek = new Date(viewWeek);
+  viewWeek.setDate(viewWeek.getDate() - 7);
+  renderTracker();
+});
+document.getElementById('weekNext').addEventListener('click', () => {
+  viewWeek = new Date(viewWeek);
+  viewWeek.setDate(viewWeek.getDate() + 7);
+  renderTracker();
+});
+
 document.getElementById('trackerGrid').addEventListener('click', e => {
   // Don't treat the grip handle as a click on the name
   if (e.target.closest('.grip-handle')) return;
@@ -1979,12 +2355,22 @@ document.addEventListener('keydown', e => {
   }
   if (document.querySelector('.tab.active').dataset.tab === 'today') {
     if (e.key === 'ArrowLeft') {
-      viewMonth.month--;
-      if (viewMonth.month < 0) { viewMonth.month = 11; viewMonth.year--; }
+      if (viewMode === 'week') {
+        viewWeek = new Date(viewWeek);
+        viewWeek.setDate(viewWeek.getDate() - 7);
+      } else {
+        viewMonth.month--;
+        if (viewMonth.month < 0) { viewMonth.month = 11; viewMonth.year--; }
+      }
       renderTracker();
     } else if (e.key === 'ArrowRight') {
-      viewMonth.month++;
-      if (viewMonth.month > 11) { viewMonth.month = 0; viewMonth.year++; }
+      if (viewMode === 'week') {
+        viewWeek = new Date(viewWeek);
+        viewWeek.setDate(viewWeek.getDate() + 7);
+      } else {
+        viewMonth.month++;
+        if (viewMonth.month > 11) { viewMonth.month = 0; viewMonth.year++; }
+      }
       renderTracker();
     }
   }
@@ -1993,6 +2379,7 @@ document.addEventListener('keydown', e => {
 const savedTheme = localStorage.getItem(THEME_KEY)
   || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
 setTheme(savedTheme);
+applyViewMode();
 render();
 
 // Register service worker (PWA / offline support)
