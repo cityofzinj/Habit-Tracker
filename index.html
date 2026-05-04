@@ -497,18 +497,20 @@
     stroke-linejoin: round;
     fill: none;
   }
-  .grid-cell.dot:not(.empty-day):not(.unscheduled):hover .dot-circle {
-    opacity: 0.35;
-    transform: scale(1);
+  @media (hover: hover) {
+    .grid-cell.dot:not(.empty-day):not(.unscheduled):hover .dot-circle {
+      opacity: 0.35;
+      transform: scale(1);
+    }
+    .grid-cell.dot.filled:hover .dot-circle {
+      opacity: 1;
+      transform: scale(1.08);
+    }
   }
   .grid-cell.dot.filled .dot-circle {
     opacity: 1;
     transform: scale(1);
     box-shadow: 0 1px 3px var(--habit-shadow, rgba(0, 0, 0, 0.15));
-  }
-  .grid-cell.dot.filled:hover .dot-circle {
-    opacity: 1;
-    transform: scale(1.08);
   }
 
   /* Empty/ledger rows for adding new habits */
