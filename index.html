@@ -244,6 +244,12 @@
     font-style: italic;
     color: var(--text-muted);
   }
+  .head-left {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
   .head-right {
     display: flex;
     flex-direction: column;
@@ -924,15 +930,15 @@
     <!-- ===== TRACKER VIEW ===== -->
     <section class="view active" id="view-today">
       <div class="tracker-head">
-        <h1 class="tracker-title">Habit Tracker</h1>
-        <div class="head-right">
+        <div class="head-left">
+          <h1 class="tracker-title">Habit Tracker</h1>
           <div class="streak-pill zero" id="streakPill" title="Consecutive days where every scheduled habit was completed">
             <span class="flame">🔥</span>
             <span class="streak-num" id="streakNum">0</span>
             <span class="streak-label">day streak</span>
           </div>
-          <div class="tracker-year" id="yearLabel"></div>
         </div>
+        <div class="tracker-year" id="yearLabel"></div>
       </div>
       <div class="tracker-wrap">
         <div class="months-bar" id="monthsBar"></div>
