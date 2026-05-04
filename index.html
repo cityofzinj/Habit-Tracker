@@ -244,6 +244,38 @@
     font-style: italic;
     color: var(--text-muted);
   }
+  .head-right {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 8px;
+  }
+  .streak-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--gradient);
+    color: white;
+    border-radius: 999px;
+    padding: 8px 16px 8px 12px;
+    font-size: 13px;
+    font-weight: 600;
+    box-shadow: 0 4px 14px -3px rgba(37, 99, 235, 0.5);
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .streak-pill:hover { transform: translateY(-1px); box-shadow: 0 8px 20px -4px rgba(37, 99, 235, 0.55); }
+  .streak-pill .flame { font-size: 18px; line-height: 1; filter: drop-shadow(0 1px 2px rgba(0,0,0,0.25)); }
+  .streak-pill .streak-num { font-size: 18px; font-weight: 800; letter-spacing: -0.02em; }
+  .streak-pill .streak-label { font-weight: 500; font-size: 12px; opacity: 0.95; text-transform: uppercase; letter-spacing: 0.05em; }
+  .streak-pill.zero {
+    background: var(--card);
+    color: var(--text-muted);
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow-sm);
+  }
+  .streak-pill.zero:hover { box-shadow: var(--shadow); }
+  .streak-pill.zero .streak-num { color: var(--text); }
+  .streak-pill.zero .flame { filter: grayscale(0.6); opacity: 0.7; }
 
   .months-bar {
     display: flex;
@@ -893,7 +925,14 @@
     <section class="view active" id="view-today">
       <div class="tracker-head">
         <h1 class="tracker-title">Habit Tracker</h1>
-        <div class="tracker-year" id="yearLabel"></div>
+        <div class="head-right">
+          <div class="streak-pill zero" id="streakPill" title="Consecutive days where every scheduled habit was completed">
+            <span class="flame">🔥</span>
+            <span class="streak-num" id="streakNum">0</span>
+            <span class="streak-label">day streak</span>
+          </div>
+          <div class="tracker-year" id="yearLabel"></div>
+        </div>
       </div>
       <div class="tracker-wrap">
         <div class="months-bar" id="monthsBar"></div>
@@ -1287,6 +1326,34 @@ function dayCompletionRatio(date) {
   return done / scheduled.length;
 }
 
+function calcDailyStreak() {
+  if (state.habits.length === 0) return 0;
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  let cursor = new Date(today);
+  // If today isn't fully done yet, anchor at yesterday so a partial today doesn't break the streak
+  const todayR = dayCompletionRatio(cursor);
+  if (todayR !== null && todayR < 1) {
+    cursor.setDate(cursor.getDate() - 1);
+  }
+  let streak = 0;
+  for (let i = 0; i < 1000; i++) {
+    const r = dayCompletionRatio(cursor);
+    if (r === null) {
+      // No habits scheduled this day — neutral, skip without breaking
+      cursor.setDate(cursor.getDate() - 1);
+      continue;
+    }
+    if (r === 1) {
+      streak++;
+      cursor.setDate(cursor.getDate() - 1);
+    } else {
+      break;
+    }
+  }
+  return streak;
+}
+
 /* Render */
 function render() {
   const tab = document.querySelector('.tab.active').dataset.tab;
@@ -1296,6 +1363,11 @@ function render() {
 
 function renderTracker() {
   document.getElementById('yearLabel').textContent = String(viewMonth.year);
+  const streak = calcDailyStreak();
+  document.getElementById('streakNum').textContent = streak;
+  const pill = document.getElementById('streakPill');
+  pill.classList.toggle('zero', streak === 0);
+  pill.querySelector('.streak-label').textContent = streak === 1 ? 'day streak' : 'day streak';
   renderMonths();
   renderGrid();
 }
