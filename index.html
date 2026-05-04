@@ -288,11 +288,17 @@
 
   /* Tracker grid */
   .tracker-grid {
-    display: grid;
-    grid-template-columns: 220px repeat(31, minmax(24px, 1fr));
     background: var(--card);
     border-left: 1px solid var(--grid-line);
     border-right: 1px solid var(--grid-line);
+    display: flex;
+    flex-direction: column;
+  }
+  .habit-row {
+    display: grid;
+    grid-template-columns: 220px repeat(31, minmax(24px, 1fr));
+    position: relative;
+    transition: opacity 0.15s, background 0.15s;
   }
   .grid-cell {
     border-bottom: 1px solid var(--grid-line);
@@ -304,7 +310,45 @@
     position: relative;
     background: var(--card);
   }
-  .grid-cell:nth-child(32n) { border-right: none; }
+  .habit-row > .grid-cell:last-child { border-right: none; }
+
+  /* Grip handle for drag-reorder */
+  .grip-handle {
+    position: absolute;
+    left: 4px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 18px;
+    height: 26px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-subtle);
+    cursor: grab;
+    opacity: 0;
+    transition: opacity 0.15s, color 0.15s;
+    z-index: 2;
+    border-radius: 4px;
+  }
+  .habit-row:hover .grip-handle { opacity: 0.7; }
+  .grip-handle:hover { opacity: 1 !important; color: var(--primary); background: var(--card-hover); }
+  .grip-handle:active { cursor: grabbing; }
+
+  /* Drag visual states */
+  .habit-row.dragging { opacity: 0.35; }
+  .habit-row.drop-above::before,
+  .habit-row.drop-below::after {
+    content: '';
+    position: absolute;
+    left: 0; right: 0;
+    height: 2.5px;
+    background: var(--primary);
+    z-index: 5;
+    pointer-events: none;
+    border-radius: 2px;
+  }
+  .habit-row.drop-above::before { top: -1.5px; }
+  .habit-row.drop-below::after { bottom: -1.5px; }
 
   /* Header row */
   .grid-cell.head {
@@ -337,7 +381,7 @@
   /* Habit name cell */
   .grid-cell.name {
     justify-content: flex-start;
-    padding: 8px 16px;
+    padding: 8px 16px 8px 26px;
     font-family: 'Caveat', 'Comic Sans MS', cursive;
     font-size: 22px;
     font-weight: 500;
@@ -1264,6 +1308,8 @@ function renderMonths() {
   }).join('');
 }
 
+const GRIP_SVG = '<svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><circle cx="9" cy="6" r="1.5"/><circle cx="15" cy="6" r="1.5"/><circle cx="9" cy="12" r="1.5"/><circle cx="15" cy="12" r="1.5"/><circle cx="9" cy="18" r="1.5"/><circle cx="15" cy="18" r="1.5"/></svg>';
+
 function renderGrid() {
   const grid = document.getElementById('trackerGrid');
   const today = new Date();
@@ -1275,19 +1321,23 @@ function renderGrid() {
   let html = '';
 
   // Header row
+  html += `<div class="habit-row header-row">`;
   html += `<div class="grid-cell head label">Habits</div>`;
   for (let d = 1; d <= 31; d++) {
     const isExtra = d > daysInMonth;
     const isToday = d === todayD;
     html += `<div class="grid-cell head day-num ${isToday ? 'today' : ''} ${isExtra ? 'extra' : ''}">${isExtra ? '' : d}</div>`;
   }
+  html += `</div>`;
 
   // Habit rows
   state.habits.forEach(h => {
     const habitColor = h.color || COLORS[0];
     const habitShadow = hexToRgba(habitColor, 0.35);
     const styleVars = `--habit-color: ${habitColor}; --habit-shadow: ${habitShadow};`;
-    html += `<div class="grid-cell name" style="${styleVars}" data-detail="${h.id}">`;
+    html += `<div class="habit-row draggable" draggable="true" data-habit-id="${h.id}" style="${styleVars}">`;
+    html += `<div class="grid-cell name" data-edit="${h.id}">`;
+    html += `<span class="grip-handle" title="Drag to reorder" aria-label="Drag to reorder">${GRIP_SVG}</span>`;
     if (h.icon) html += `<span class="name-icon">${escapeHtml(h.icon)}</span>`;
     html += `<span class="name-text">${escapeHtml(h.name)}</span></div>`;
     for (let d = 1; d <= 31; d++) {
@@ -1305,15 +1355,16 @@ function renderGrid() {
         !sched ? 'unscheduled' : '',
         isToday ? 'today' : ''
       ].filter(Boolean).join(' ');
-      html += `<div class="${cls}" style="${styleVars}" data-habit="${h.id}" data-key="${k}" ${!sched ? 'data-unsched="1"' : ''} title="${date.toLocaleDateString()}"><div class="dot-circle"></div></div>`;
+      html += `<div class="${cls}" data-habit="${h.id}" data-key="${k}" ${!sched ? 'data-unsched="1"' : ''} title="${date.toLocaleDateString()}"><div class="dot-circle"></div></div>`;
     }
+    html += `</div>`;
   });
 
   // Empty ledger rows for adding new habits
   for (let r = 0; r < EMPTY_ROWS_AFTER_HABITS; r++) {
-    const isFirst = r === 0 && state.habits.length === 0;
     const showHint = r === 0;
-    html += `<div class="grid-cell name empty-row ${isFirst ? 'first' : ''}" data-add-habit="1">`;
+    html += `<div class="habit-row empty-habit-row" data-add-habit="1">`;
+    html += `<div class="grid-cell name empty-row ${state.habits.length === 0 && r === 0 ? 'first' : ''}">`;
     if (showHint) {
       html += `<span class="add-hint">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
@@ -1324,6 +1375,7 @@ function renderGrid() {
     for (let d = 1; d <= 31; d++) {
       html += `<div class="grid-cell dot empty-day"></div>`;
     }
+    html += `</div>`;
   }
 
   grid.innerHTML = html;
@@ -1622,6 +1674,8 @@ document.getElementById('monthsBar').addEventListener('click', e => {
 });
 
 document.getElementById('trackerGrid').addEventListener('click', e => {
+  // Don't treat the grip handle as a click on the name
+  if (e.target.closest('.grip-handle')) return;
   const dotCell = e.target.closest('.grid-cell.dot');
   if (dotCell && !dotCell.classList.contains('empty-day')) {
     if (dotCell.dataset.unsched) return;
@@ -1631,10 +1685,83 @@ document.getElementById('trackerGrid').addEventListener('click', e => {
     if (h && key) toggleDay(h, key);
     return;
   }
+  const editTarget = e.target.closest('[data-edit]');
+  if (editTarget) { openHabitModal(editTarget.dataset.edit); return; }
   const addRow = e.target.closest('[data-add-habit]');
   if (addRow) { openHabitModal(null); return; }
-  const detail = e.target.closest('[data-detail]');
-  if (detail) { openDetail(detail.dataset.detail); return; }
+});
+
+/* Drag-to-reorder */
+let dragSrcId = null;
+
+function clearDropMarkers() {
+  document.querySelectorAll('.habit-row.drop-above, .habit-row.drop-below').forEach(el => {
+    el.classList.remove('drop-above', 'drop-below');
+  });
+}
+
+document.getElementById('trackerGrid').addEventListener('dragstart', e => {
+  const row = e.target.closest('.habit-row.draggable');
+  if (!row) return;
+  dragSrcId = row.dataset.habitId;
+  row.classList.add('dragging');
+  if (e.dataTransfer) {
+    e.dataTransfer.effectAllowed = 'move';
+    try { e.dataTransfer.setData('text/plain', dragSrcId); } catch {}
+  }
+});
+
+document.getElementById('trackerGrid').addEventListener('dragover', e => {
+  if (!dragSrcId) return;
+  const row = e.target.closest('.habit-row.draggable');
+  if (!row) return;
+  e.preventDefault();
+  if (e.dataTransfer) e.dataTransfer.dropEffect = 'move';
+  if (row.dataset.habitId === dragSrcId) { clearDropMarkers(); return; }
+  clearDropMarkers();
+  const rect = row.getBoundingClientRect();
+  const midY = rect.top + rect.height / 2;
+  if (e.clientY < midY) row.classList.add('drop-above');
+  else row.classList.add('drop-below');
+});
+
+document.getElementById('trackerGrid').addEventListener('dragleave', e => {
+  // Only clear markers when leaving the grid entirely
+  if (!e.relatedTarget || !document.getElementById('trackerGrid').contains(e.relatedTarget)) {
+    clearDropMarkers();
+  }
+});
+
+document.getElementById('trackerGrid').addEventListener('drop', e => {
+  if (!dragSrcId) return;
+  const row = e.target.closest('.habit-row.draggable');
+  if (!row || row.dataset.habitId === dragSrcId) {
+    clearDropMarkers();
+    dragSrcId = null;
+    return;
+  }
+  e.preventDefault();
+  const targetId = row.dataset.habitId;
+  const placeBelow = row.classList.contains('drop-below');
+  clearDropMarkers();
+
+  const fromIdx = state.habits.findIndex(h => h.id === dragSrcId);
+  if (fromIdx < 0) { dragSrcId = null; return; }
+  const [moved] = state.habits.splice(fromIdx, 1);
+  let toIdx = state.habits.findIndex(h => h.id === targetId);
+  if (toIdx < 0) toIdx = state.habits.length;
+  if (placeBelow) toIdx++;
+  state.habits.splice(toIdx, 0, moved);
+  save();
+  render();
+  dragSrcId = null;
+  toast('Reordered');
+});
+
+document.getElementById('trackerGrid').addEventListener('dragend', () => {
+  document.querySelectorAll('.habit-row.dragging').forEach(el => el.classList.remove('dragging'));
+  clearDropMarkers();
+  dragSrcId = null;
 });
 
 document.querySelectorAll('[data-close-modal]').forEach(b => b.addEventListener('click', closeModals));
