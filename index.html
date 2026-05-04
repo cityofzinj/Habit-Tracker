@@ -119,12 +119,17 @@
     position: sticky; top: 0; z-index: 50;
     backdrop-filter: saturate(180%) blur(12px);
     -webkit-backdrop-filter: saturate(180%) blur(12px);
+    padding-top: env(safe-area-inset-top, 0px);
+  }
+  /* PWA standalone mode: ensure a baseline top inset so the dynamic island
+     never overlaps controls, even if env() reports 0 in some iOS contexts. */
+  @media (display-mode: standalone) {
+    .topbar { padding-top: max(env(safe-area-inset-top, 0px), 50px); }
   }
   .topbar-inner {
     max-width: 1320px;
     margin: 0 auto;
     padding: 12px 24px;
-    padding-top: max(12px, env(safe-area-inset-top));
     padding-left: max(24px, env(safe-area-inset-left));
     padding-right: max(24px, env(safe-area-inset-right));
     display: flex;
