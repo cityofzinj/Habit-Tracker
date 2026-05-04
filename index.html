@@ -475,6 +475,18 @@
     transform: scale(0.6);
     transition: opacity 0.18s, transform 0.18s;
     pointer-events: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .dot-check {
+    width: 62%;
+    height: 62%;
+    stroke: white;
+    stroke-width: 3.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    fill: none;
   }
   .grid-cell.dot:not(.empty-day):not(.unscheduled):hover .dot-circle {
     opacity: 0.35;
@@ -1452,7 +1464,7 @@ function renderGrid() {
         !sched ? 'unscheduled' : '',
         isToday ? 'today' : ''
       ].filter(Boolean).join(' ');
-      html += `<div class="${cls}" data-habit="${h.id}" data-key="${k}" ${!sched ? 'data-unsched="1"' : ''} title="${date.toLocaleDateString()}"><div class="dot-circle"></div></div>`;
+      html += `<div class="${cls}" data-habit="${h.id}" data-key="${k}" ${!sched ? 'data-unsched="1"' : ''} title="${date.toLocaleDateString()}"><div class="dot-circle"><svg class="dot-check" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div></div>`;
     }
     html += `</div>`;
   });
